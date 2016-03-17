@@ -39,6 +39,12 @@ function posredujNapako404(odgovor) {
     odgovor.end();
 }
 
+function posredujNapako409(odgovor) {
+    odgovor.writeHead(404, {'Content-Type': 'text/plain'});
+    odgovor.write("Napaka 409: Datoteka ze obstaja!");
+    odgovor.end();
+}
+
 function posredujNapako500(odgovor) {
     odgovor.writeHead(500, {'Content-Type': 'text/plain'});
     odgovor.write("Napaka 500: Napaka na strezniku!");
@@ -104,11 +110,18 @@ function naloziDatoteko(zahteva, odgovor) {
     form.on('end', function(fields, files) {
         var zacasnaPot = this.openedFiles[0].path;
         var datoteka = this.openedFiles[0].name;
-        fs.copy(zacasnaPot, dataDir + datoteka, function(napaka) {  
-            if (napaka) {
-                posredujNapako500(odgovor);
+        
+        fs.exists(dataDir + datoteka, function(exists) {
+            if(exists) {
+                posredujNapako409(odgovor);
             } else {
-                posredujOsnovnoStran(odgovor);        
+                fs.copy(zacasnaPot, dataDir + datoteka, function(napaka) {  
+                    if (napaka) {
+                        posredujNapako500(odgovor);
+                    } else {
+                        posredujOsnovnoStran(odgovor);        
+                    }
+                });
             }
         });
     });
