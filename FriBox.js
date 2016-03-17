@@ -113,3 +113,15 @@ function naloziDatoteko(zahteva, odgovor) {
         });
     });
 }
+
+function izbrisiDatoteko(odgovor, datoteka) {
+    fs.unlink(datoteka, function(napaka) {
+        if(napaka) {
+            posredujNapako404(odgovor);
+        } else {
+            odgovor.writeHead(200, {'Content-Type': 'text/plain'});
+            odgovor.write("Datoteka izbrisana");
+            odgovor.end();
+        }
+    });
+}
